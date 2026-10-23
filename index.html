@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Carte de visite</title>
+  <link rel="icon" href="images/logo.svg">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main>
+    <!-- Clic sur la carte = retourner (recto / verso) -->
+    <button class="card" id="card" aria-label="Retourner la carte">
+      <div class="face front">
+        <img class="logo" src="images/logo.svg" alt="">
+        <div>
+          <h1 id="name"></h1>
+          <p class="title" id="title"></p>
+        </div>
+        <p class="hint">Cliquer pour retourner</p>
+      </div>
+
+      <div class="face back">
+        <ul>
+          <li><span>Email</span> <a id="email"></a></li>
+          <li><span>Tél.</span> <a id="phone"></a></li>
+          <li><span>Lieu</span> <em id="city"></em></li>
+          <li><span>Web</span> <a id="web" target="_blank" rel="noopener"></a></li>
+        </ul>
+      </div>
+    </button>
+
+    <div class="actions">
+      <button id="vcard">Enregistrer le contact (.vcf)</button>
+      <button id="print">Imprimer</button>
+    </div>
+  </main>
+
+  <script>
+    // ✏️ Modifie tes infos ici, tout le reste se met à jour tout seul
+    const person = {
+      name:  "Stéphane",
+      title: "Ingénieur système · Backup & Storage",
+      email: "prenom.nom@exemple.ch",
+      phone: "+41 79 000 00 00",
+      city:  "Jura, Suisse",
+      web:   "https://exemple.ch",
+    };
+
+    const $ = (id) => document.getElementById(id);
+    $("name").textContent  = person.name;
+    $("title").textContent = person.title;
+    $("email").textContent = person.email;
+    $("email").href = "mailto:" + person.email;
+    $("phone").textContent = person.phone;
+    $("phone").href = "tel:" + person.phone.replace(/\s/g, "");
+    $("city").textContent  = person.city;
+    $("web").textContent   = person.web.replace(/^https?:\/\//, "");
+    $("web").href = person.web;
+
+    // Retourner la carte (sauf si on clique sur un lien)
+    $("card").addEventListener("click", (e) => {
+      if (!e.target.closest("a")) $("card").classList.toggle("flipped");
+    });
+
+    // Génère un fichier vCard que le téléphone / Contacts sait importer
+    $("vcard").addEventListener("click", () => {
+      const vcf = [
+        "BEGIN:VCARD", "VERSION:3.0",
+        "FN:" + person.name,
+        "TITLE:" + person.title,
+        "EMAIL:" + person.email,
+        "TEL:" + person.phone,
+        "ADR:;;;" + person.city + ";;;",
+        "URL:" + person.web,
+        "END:VCARD",
+      ].join("\r\n");
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(new Blob([vcf], { type: "text/vcard" }));
+      link.download = person.name.replace(/\s+/g, "_") + ".vcf";
+      link.click();
+      URL.revokeObjectURL(link.href);
+    });
+
+    $("print").addEventListener("click", () => window.print());
+  </script>
+</body>
+</html>
