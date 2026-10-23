@@ -19,3 +19,5 @@ npm run dev
 ```
 
 `npm run build` produit une version prête à mettre en ligne dans `dist/`.
+
+Happy coding!
